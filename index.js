@@ -9,12 +9,12 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Serve static files in public folder
+// Serve static files from 'public' folder (logo image, etc)
 app.use(express.static('public'));
 
-// Helper function to generate HTML email
+// Helper function to generate HTML email content
 function generateEmailHtml(formData, resources) {
-  // Use your deployed backend URL here
+  // Use your deployed backend URL or localhost for local dev
   const backendUrl = process.env.BACKEND_URL || `http://localhost:${PORT}`;
   const logoUrl = `${backendUrl}/Opencare-Logo-Sage.png`;
 
@@ -45,32 +45,32 @@ function generateEmailHtml(formData, resources) {
   `;
 }
 
-// Email route
+// POST /submit route to receive survey data and send email
 app.post('/submit', async (req, res) => {
   const formData = req.body;
 
-  // Determine which training links to include based on answers
+  // Determine recommended resources based on answers
   const resources = [];
   if (formData.login_access === 'No') resources.push('login');
   if (formData.reviewed_content === 'No') resources.push('getting_started');
   if (formData.confidence === 'No') resources.push('dashboard');
   if (formData.billing_concerns === 'Yes') resources.push('billing');
 
-  // Create HTML email body
+  // Generate email HTML body
   const emailHtml = generateEmailHtml(formData, resources);
 
-  // Nodemailer transporter config
+  // Setup nodemailer transporter with Gmail SMTP
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: process.env.EMAIL_USER,      // your Gmail address
-      pass: process.env.EMAIL_PASS       // your Gmail app password
+      user: process.env.EMAIL_USER,      // your Gmail address from .env
+      pass: process.env.EMAIL_PASS       // your Gmail app password from .env
     }
   });
 
   const mailOptions = {
     from: `"Opencare Training" <${process.env.EMAIL_USER}>`,
-    to: formData.recipient_emails,
+    to: formData.recipient_emails,       // recipient email(s) from request body
     subject: 'Your Opencare Pre-Onboarding Survey Results',
     html: emailHtml
   };
@@ -84,11 +84,12 @@ app.post('/submit', async (req, res) => {
   }
 });
 
-// Simple test endpoint
+// Simple test endpoint to verify server is running
 app.get('/', (req, res) => {
   res.send('Opencare Backend is Running!');
 });
 
+// Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
