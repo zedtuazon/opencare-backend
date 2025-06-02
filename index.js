@@ -6,7 +6,11 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+// Enable CORS only for your frontend domain
+app.use(cors({
+  origin: 'https://opencare-frontend.onrender.com'
+}));
+
 app.use(express.json());
 app.use(express.static('public'));
 
