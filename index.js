@@ -14,7 +14,6 @@ app.use(express.static('public'));
 
 // Helper function to generate HTML email content
 function generateEmailHtml(formData, resources) {
-  // Use your deployed backend URL or localhost for local dev
   const backendUrl = process.env.BACKEND_URL || `http://localhost:${PORT}`;
   const logoUrl = `${backendUrl}/Opencare-Logo-Sage.png`;
 
@@ -49,6 +48,10 @@ function generateEmailHtml(formData, resources) {
 app.post('/submit', async (req, res) => {
   const formData = req.body;
 
+  if (!formData.results_emails || !Array.isArray(formData.results_emails) || formData.results_emails.length === 0) {
+    return res.status(400).json({ error: 'No recipient emails provided' });
+  }
+
   // Determine recommended resources based on answers
   const resources = [];
   if (formData.login_access === 'No') resources.push('login');
@@ -70,7 +73,7 @@ app.post('/submit', async (req, res) => {
 
   const mailOptions = {
     from: `"Opencare Training" <${process.env.EMAIL_USER}>`,
-    to: formData.recipient_emails,       // recipient email(s) from request body
+    to: formData.results_emails.join(','), // join array to comma-separated string for nodemailer
     subject: 'Your Opencare Pre-Onboarding Survey Results',
     html: emailHtml
   };
