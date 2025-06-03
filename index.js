@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 
 // Enable CORS for frontend
 app.use(cors({
-  origin: 'https://opencare-frontend.onrender.com'
+  origin: 'https://opencare-preonboardingsurvey.onrender.com'
 }));
 
 app.use(express.json());
@@ -16,7 +16,7 @@ app.use(express.static('public'));
 
 // Generate the email HTML
 function generateEmailHtml(formData, resources) {
-  const logoUrl = 'https://opencare-frontend.onrender.com/Opencare-Logo-Sage.png';
+  const logoUrl = 'https://opencare-preonboardingsurvey.onrender.com/Opencare-Logo-Sage.png';
 
   return `
     <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; width: 100%;">
