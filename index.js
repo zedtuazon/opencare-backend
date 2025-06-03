@@ -30,7 +30,7 @@ function generateEmailHtml(formData, resources) {
       <hr style="border: none; border-top: 3px solid #003366; margin: 0; width: 100%;" />
 
       <!-- Survey Responses Title -->
-      <h2 style="color: #003366; padding-bottom: 4px; margin: 0 0 8px 0;">Survey Responses</h2>
+      <h2 style="color: #003366; padding-bottom: 4px; margin: 16px 0 8px 0;">Survey Responses</h2>
 
       <!-- Left aligned content with tighter spacing -->
       <div style="text-align: left;">
