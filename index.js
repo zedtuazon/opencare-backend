@@ -16,16 +16,18 @@ app.use(express.static('public'));
 
 // Generate the email HTML body
 function generateEmailHtml(formData, resources) {
-  // Use your frontend URL where the logo is publicly accessible
   const logoUrl = 'https://opencare-frontend.onrender.com/Opencare-Logo-Sage.png';
 
   return `
     <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; width: 100%;">
 
-      <!-- Centered Logo -->
-      <div style="text-align: center; margin-bottom: 10px;">
-        <img src="${logoUrl}" alt="Opencare Logo" style="height: 60px;" />
+      <!-- Centered bigger logo -->
+      <div style="text-align: center; margin-bottom: 8px;">
+        <img src="${logoUrl}" alt="Opencare Logo" style="height: 80px;" />
       </div>
+
+      <!-- Bold separation line -->
+      <hr style="border: none; border-top: 3px solid #003366; margin: 0 0 16px 0;" />
 
       <!-- Survey Responses Title -->
       <h2 style="color: #003366; padding-bottom: 4px; margin: 0 0 8px 0;">Survey Responses</h2>
