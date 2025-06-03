@@ -20,26 +20,28 @@ function generateEmailHtml(formData, resources) {
 
   return `
     <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; width: 100%;">
-
       <!-- Centered bigger logo -->
       <div style="text-align: center; margin-bottom: 8px;">
-        <img src="${logoUrl}" alt="Opencare Logo" style="height: 80px;" />
+        <img src="${logoUrl}" alt="Opencare Logo" style="height: 90px;" />
       </div>
 
-      <!-- Bold separation line - FULL WIDTH -->
-      <hr style="border: none; border-top: 3px solid #003366; margin: 0; width: 100%;" />
+      <!-- Bold separation line full width -->
+      <hr style="border: none; border-top: 4px solid #003366; margin: 0 0 16px 0; width: 100%;" />
 
-      <!-- Survey Responses Title -->
-      <h2 style="color: #003366; padding-bottom: 4px; margin: 16px 0 8px 0;">Survey Responses</h2>
+      <!-- Add space above Survey Responses -->
+      <div style="margin-top: 10px;">
+        <!-- Survey Responses Title -->
+        <h2 style="color: #003366; padding-bottom: 4px; margin: 0 0 8px 0;">Survey Responses</h2>
 
-      <!-- Left aligned content with tighter spacing -->
-      <div style="text-align: left;">
-        <p style="margin: 2px 0;"><strong>Practice Name:</strong> ${formData.practice_name}</p>
-        <p style="margin: 2px 0;"><strong>Top Priority:</strong> ${formData.top_priority}${formData.top_priority === 'Something else' ? ` - ${formData.priority_detail}` : ''}</p>
-        <p style="margin: 2px 0;"><strong>Login Access:</strong> ${formData.login_access}</p>
-        <p style="margin: 2px 0;"><strong>Getting Started:</strong> ${formData.reviewed_content}</p>
-        <p style="margin: 2px 0;"><strong>Platform Confidence:</strong> ${formData.confidence}</p>
-        <p style="margin: 2px 0;"><strong>Billing Concerns:</strong> ${formData.billing_concerns}</p>
+        <!-- Left aligned content with tighter spacing -->
+        <div style="text-align: left;">
+          <p style="margin: 2px 0;"><strong>Practice Name:</strong> ${formData.practice_name}</p>
+          <p style="margin: 2px 0;"><strong>Top Priority:</strong> ${formData.top_priority}${formData.top_priority === 'Something else' ? ` - ${formData.priority_detail}` : ''}</p>
+          <p style="margin: 2px 0;"><strong>Login Access:</strong> ${formData.login_access}</p>
+          <p style="margin: 2px 0;"><strong>Getting Started:</strong> ${formData.reviewed_content}</p>
+          <p style="margin: 2px 0;"><strong>Platform Confidence:</strong> ${formData.confidence}</p>
+          <p style="margin: 2px 0;"><strong>Billing Concerns:</strong> ${formData.billing_concerns}</p>
+        </div>
       </div>
 
       <!-- Recommended Training Materials Title -->
@@ -83,13 +85,14 @@ app.post('/submit', async (req, res) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: process.env.EMAIL_USER,
+      user: process.env.EMAIL_USER,  // your Gmail login email (not alias)
       pass: process.env.EMAIL_PASS,
     }
   });
 
+  // Use your alias email as the "from" address here
   const mailOptions = {
-    from: `"Opencare Training" <${process.env.EMAIL_USER}>`,
+    from: `"Opencare Training" <enablement@opencare.com>`,  // <-- alias email
     to: formData.results_emails.join(','), // comma-separated string
     subject: 'Opencare Pre-Onboarding Survey Summary & Training Materials',
     html: emailHtml
