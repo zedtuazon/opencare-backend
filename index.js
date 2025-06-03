@@ -16,40 +16,46 @@ app.use(express.static('public'));
 
 // Generate the email HTML body
 function generateEmailHtml(formData, resources) {
-  const backendUrl = process.env.BACKEND_URL || `http://localhost:${PORT}`;
-  const logoUrl = `${backendUrl}/Opencare-Logo-Sage.png`;
+  // Use the frontend URL to serve the logo correctly
+  const logoUrl = 'https://opencare-frontend.onrender.com/Opencare-Logo-Sage.png';
 
   return `
-    <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto;">
-      <!-- Centered logo -->
-      <div style="text-align: center; margin-bottom: 12px;">
+    <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
+
+      <!-- Centered Logo -->
+      <div style="text-align: center; margin-bottom: 10px;">
         <img src="${logoUrl}" alt="Opencare Logo" style="height: 60px;" />
       </div>
-      <!-- Separation line -->
-      <hr style="border: none; border-top: 1px solid #ccc; margin-bottom: 20px;" />
+
+      <!-- Survey Responses Title with dark blue color -->
+      <h2 style="color: #003366; padding-bottom: 8px; margin-top: 0;">Survey Responses</h2>
 
       <!-- Left aligned content -->
       <div style="text-align: left;">
-        <h2 style="color: #007BFF; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-top: 0;">Survey Responses</h2>
         <p><strong>Practice Name:</strong> ${formData.practice_name}</p>
         <p><strong>Top Priority:</strong> ${formData.top_priority}${formData.top_priority === 'Something else' ? ` - ${formData.priority_detail}` : ''}</p>
         <p><strong>Login Access:</strong> ${formData.login_access}</p>
         <p><strong>Getting Started:</strong> ${formData.reviewed_content}</p>
         <p><strong>Platform Confidence:</strong> ${formData.confidence}</p>
         <p><strong>Billing Concerns:</strong> ${formData.billing_concerns}</p>
-
-        <h2 style="color: #007BFF; margin-top: 24px; margin-bottom: 12px;">Recommended Training Materials</h2>
-        <ul style="padding-left: 20px; margin-top: 0; margin-bottom: 24px;">
-          ${resources.includes('login') ? `<li><a href="https://opencarepractice.zendesk.com/hc/en-us/articles/34764947028628-How-to-Login-to-my-Opencare-Account" style="color:#007BFF;">How to Log In to Opencare</a></li>` : ''}
-          ${resources.includes('getting_started') ? `<li><a href="https://opencarepractice.zendesk.com/hc/en-us/categories/34649397171220" style="color:#007BFF;">Getting Started with Opencare</a></li>` : ''}
-          ${resources.includes('dashboard') ? `<li><a href="https://opencarepractice.zendesk.com/hc/en-us/articles/18554516947732-Navigating-the-Opencare-Dashboard" style="color:#007BFF;">Navigating the Opencare Dashboard</a></li>` : ''}
-          ${resources.includes('billing') ? `<li><a href="https://opencarepractice.zendesk.com/hc/en-us/sections/18554146776468-Module-3-Billing" style="color:#007BFF;">Billing at Opencare</a></li>` : ''}
-        </ul>
-
-        <hr style="border: none; border-top: 1px solid #eee; margin-bottom: 12px;" />
-        
-        <p>If you have any questions, please don't hesitate to respond to this email.</p>
       </div>
+
+      <!-- Recommended Training Materials Title with dark blue color -->
+      <h2 style="color: #003366; padding-top: 16px; margin-top: 32px;">Recommended Training Materials</h2>
+
+      <!-- Training links left aligned, no bullet -->
+      <div style="text-align: left;">
+        ${resources.includes('login') ? `<p><a href="https://opencarepractice.zendesk.com/hc/en-us/articles/34764947028628-How-to-Login-to-my-Opencare-Account" style="color:#007BFF; text-decoration: none;">How to Log In to Opencare</a></p>` : ''}
+        ${resources.includes('getting_started') ? `<p><a href="https://opencarepractice.zendesk.com/hc/en-us/categories/34649397171220" style="color:#007BFF; text-decoration: none;">Getting Started with Opencare</a></p>` : ''}
+        ${resources.includes('dashboard') ? `<p><a href="https://opencarepractice.zendesk.com/hc/en-us/articles/18554516947732-Navigating-the-Opencare-Dashboard" style="color:#007BFF; text-decoration: none;">Navigating the Opencare Dashboard</a></p>` : ''}
+        ${resources.includes('billing') ? `<p><a href="https://opencarepractice.zendesk.com/hc/en-us/sections/18554146776468-Module-3-Billing" style="color:#007BFF; text-decoration: none;">Billing at Opencare</a></p>` : ''}
+      </div>
+
+      <!-- Light separation line -->
+      <hr style="border: none; border-top: 1px solid #ddd; margin-top: 32px;" />
+
+      <!-- Footer -->
+      <p style="text-align: left; margin-top: 16px;">If you have any questions, please don't hesitate to respond to this email.</p>
     </div>
   `;
 }
