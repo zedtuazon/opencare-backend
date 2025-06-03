@@ -6,7 +6,7 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Enable CORS only for your frontend domain
+// Enable CORS for frontend
 app.use(cors({
   origin: 'https://opencare-frontend.onrender.com'
 }));
@@ -14,28 +14,26 @@ app.use(cors({
 app.use(express.json());
 app.use(express.static('public'));
 
-// Generate the email HTML body
+// Generate the email HTML
 function generateEmailHtml(formData, resources) {
   const logoUrl = 'https://opencare-frontend.onrender.com/Opencare-Logo-Sage.png';
 
   return `
     <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; width: 100%;">
 
-      <!-- Centered bigger logo -->
+      <!-- Logo centered -->
       <div style="text-align: center; margin-bottom: 8px;">
-        <img src="${logoUrl}" alt="Opencare Logo" style="height: 80px;" />
+        <img src="${logoUrl}" alt="Opencare Logo" style="height: 90px;" />
       </div>
 
-      <!-- Bold separation line (thickness reduced to 2px) -->
+      <!-- Thinner, darker separation line -->
       <hr style="border: none; border-top: 2px solid #003366; margin: 0 0 16px 0;" />
 
-      <!-- Add 1 space above Survey Responses -->
-      <div style="height: 8px;"></div>
+      <!-- 1 space before survey response -->
+      <div style="height: 10px;"></div>
 
-      <!-- Survey Responses Title -->
       <h2 style="color: #003366; padding-bottom: 4px; margin: 0 0 8px 0;">Survey Responses</h2>
 
-      <!-- Left aligned content with tighter spacing -->
       <div style="text-align: left;">
         <p style="margin: 2px 0;"><strong>Practice Name:</strong> ${formData.practice_name}</p>
         <p style="margin: 2px 0;"><strong>Top Priority:</strong> ${formData.top_priority}${formData.top_priority === 'Something else' ? ` - ${formData.priority_detail}` : ''}</p>
@@ -45,10 +43,8 @@ function generateEmailHtml(formData, resources) {
         <p style="margin: 2px 0;"><strong>Billing Concerns:</strong> ${formData.billing_concerns}</p>
       </div>
 
-      <!-- Recommended Training Materials Title -->
       <h2 style="color: #003366; padding-top: 12px; margin: 20px 0 8px 0;">Recommended Training Materials</h2>
 
-      <!-- Training links -->
       <div style="text-align: left;">
         ${resources.includes('login') ? `<p style="margin: 2px 0;"><a href="https://opencarepractice.zendesk.com/hc/en-us/articles/34764947028628-How-to-Login-to-my-Opencare-Account" style="color:#007BFF; text-decoration: none;">How to Log In to Opencare</a></p>` : ''}
         ${resources.includes('getting_started') ? `<p style="margin: 2px 0;"><a href="https://opencarepractice.zendesk.com/hc/en-us/categories/34649397171220" style="color:#007BFF; text-decoration: none;">Getting Started with Opencare</a></p>` : ''}
@@ -58,13 +54,12 @@ function generateEmailHtml(formData, resources) {
 
       <hr style="border: none; border-top: 1px solid #ddd; margin-top: 20px;" />
 
-      <!-- Footer -->
       <p style="text-align: left; margin: 10px 0 0 0;">If you have any questions, please don't hesitate to respond to this email.</p>
     </div>
   `;
 }
 
-// Route: handle POST /submit
+// Handle form submission
 app.post('/submit', async (req, res) => {
   const formData = req.body;
 
@@ -72,29 +67,26 @@ app.post('/submit', async (req, res) => {
     return res.status(400).json({ error: 'No recipient emails provided' });
   }
 
-  // Determine which resources to include
   const resources = [];
   if (formData.login_access === 'No') resources.push('login');
   if (formData.reviewed_content === 'No') resources.push('getting_started');
   if (formData.confidence === 'No') resources.push('dashboard');
   if (formData.billing_concerns === 'Yes') resources.push('billing');
 
-  // Generate email HTML
   const emailHtml = generateEmailHtml(formData, resources);
 
-  // Create mail transporter
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
+      user: process.env.EMAIL_USER,  // your real Gmail
+      pass: process.env.EMAIL_PASS
     }
   });
 
   const mailOptions = {
-    from: `"Opencare Training" <${process.env.EMAIL_USER}>`,
-    to: formData.results_emails.join(','), // comma-separated string
-    bcc: 'enablement@opencare.com',        // Added BCC
+    from: '"Opencare Training" <enablement@opencare.com>', // alias
+    to: formData.results_emails.join(','),
+    bcc: 'enablement@opencare.com', // keep copy
     subject: 'Opencare Pre-Onboarding Survey Summary & Training Materials',
     html: emailHtml
   };
@@ -108,12 +100,11 @@ app.post('/submit', async (req, res) => {
   }
 });
 
-// GET / - health check
+// Health check
 app.get('/', (req, res) => {
   res.send('Opencare Backend is Running!');
 });
 
-// Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
