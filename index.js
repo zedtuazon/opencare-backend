@@ -119,34 +119,26 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Allow CORS from frontend
 app.use(cors({
   origin: 'https://opencare-preonboardingsurvey.onrender.com'
 }));
-
 app.use(express.json());
 app.use(express.static('public'));
 
-// Email HTML generator
+// Updated HTML email content
 function generateEmailHtml(formData) {
   const logoUrl = 'https://opencare-preonboardingsurvey.onrender.com/Opencare-Logo-Sage.png';
 
   return `
     <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; width: 100%;">
-
-      <!-- Logo -->
       <div style="text-align: center; margin-bottom: 8px;">
         <img src="${logoUrl}" alt="Opencare Logo" style="height: 90px;" />
       </div>
 
-      <!-- Thin line -->
       <hr style="border: none; border-top: 2px solid #003366; margin: 0 0 16px 0;" />
-
-      <!-- Space before responses -->
       <div style="height: 10px;"></div>
 
       <h2 style="color: #003366; font-size: 20px; margin-bottom: 10px;">Survey Responses</h2>
-
       <div style="text-align: left; font-size: 15px;">
         <p style="margin: 4px 0;"><strong>Practice Name:</strong> ${formData.practice_name}</p>
         <p style="margin: 4px 0;"><strong>Top Priority:</strong> ${formData.top_priority}${formData.top_priority === 'Something else' ? ` - ${formData.priority_detail}` : ''}</p>
@@ -157,26 +149,22 @@ function generateEmailHtml(formData) {
       </div>
 
       <h2 style="color: #003366; font-size: 20px; margin: 24px 0 10px 0;">Recommended Training Materials</h2>
-
       <div style="text-align: left; font-size: 15px; line-height: 1.5;">
-        <p style="margin: 8px 0;"><strong>⭐ Start Here:</strong> Complete the 
-        <a href="http://training.opencare.com/" style="color:#007BFF; text-decoration: none;"><strong>“How to Use Opencare”</strong></a> Course</p>
-        
+        <p style="margin: 8px 0; font-weight: bold;">
+          Start Here: 
+          <a href="http://training.opencare.com/" style="color:#007BFF; text-decoration: none;">Complete the “How to Use Opencare” Course</a>
+        </p>
         <p style="margin: 8px 0;">
-          <strong>This is the most important step you can take to prepare for success with Opencare.</strong><br />
-          Before your onboarding call, we highly recommend going through our training course for new practices.
-          This short, self-guided experience walks you through everything you need to succeed — from setting up your profile to understanding how to get the most value out of Opencare.
+          Before your onboarding call, we highly recommend going through our training course. This short, self-guided experience walks you through everything you need to succeed — from setting up your profile to understanding how to get the most value out of Opencare.
         </p>
       </div>
 
       <hr style="border: none; border-top: 1px solid #ddd; margin-top: 20px;" />
-
       <p style="text-align: left; margin: 10px 0 0 0;">If you have any questions, please don't hesitate to respond to this email.</p>
     </div>
   `;
 }
 
-// Email handler
 app.post('/submit', async (req, res) => {
   const formData = req.body;
 
@@ -189,7 +177,7 @@ app.post('/submit', async (req, res) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: process.env.EMAIL_USER,  // Gmail address used to authenticate
+      user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS
     }
   });
@@ -211,7 +199,6 @@ app.post('/submit', async (req, res) => {
   }
 });
 
-// Health check
 app.get('/', (req, res) => {
   res.send('Opencare Backend is Running!');
 });
@@ -219,4 +206,3 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
