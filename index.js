@@ -111,6 +111,12 @@ app.listen(PORT, () => {
 });
 ==== END DEPRECATED CODE ==== */
 
+
+
+
+/* ==== DEPRECATED CODE: Survey email backend ====
+
+
 const express = require('express');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
@@ -206,3 +212,127 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+==== END DEPRECATED CODE ==== */
+
+
+const express = require('express');
+const cors = require('cors');
+const nodemailer = require('nodemailer');
+require('dotenv').config();
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(cors({
+  origin: 'https://opencare-preonboardingsurvey.onrender.com'
+}));
+app.use(express.json());
+app.use(express.static('public'));
+
+// Updated HTML email content with conditional resources
+function generateEmailHtml(formData, resources) {
+  const logoUrl = 'https://opencare-preonboardingsurvey.onrender.com/Opencare-Logo-Sage.png';
+
+  return `
+    <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; width: 100%;">
+      <div style="text-align: center; margin-bottom: 8px;">
+        <img src="${logoUrl}" alt="Opencare Logo" style="height: 90px;" />
+      </div>
+
+      <hr style="border: none; border-top: 2px solid #003366; margin: 0 0 16px 0;" />
+      <div style="height: 10px;"></div>
+
+      <h2 style="color: #003366; font-size: 20px; margin-bottom: 10px;">Survey Responses</h2>
+      <div style="text-align: left; font-size: 15px;">
+        <p style="margin: 4px 0;"><strong>Practice Name:</strong> ${formData.practice_name}</p>
+        <p style="margin: 4px 0;"><strong>Top Priority:</strong> ${formData.top_priority}${formData.top_priority === 'Something else' ? ` - ${formData.priority_detail}` : ''}</p>
+        <p style="margin: 4px 0;"><strong>Login Access:</strong> ${formData.login_access}</p>
+        <p style="margin: 4px 0;"><strong>Getting Started:</strong> ${formData.reviewed_content}</p>
+        <p style="margin: 4px 0;"><strong>Platform Confidence:</strong> ${formData.confidence}</p>
+        <p style="margin: 4px 0;"><strong>Billing Concerns:</strong> ${formData.billing_concerns}</p>
+        <p style="margin: 4px 0;"><strong>Understands Marketing:</strong> ${formData.marketing_understanding}</p>
+        <p style="margin: 4px 0;"><strong>Understands Integration:</strong> ${formData.integration_understanding}</p>
+      </div>
+
+      <h2 style="color: #003366; font-size: 20px; margin: 24px 0 10px 0;">Recommended Training Materials</h2>
+      <div style="text-align: left; font-size: 15px; line-height: 1.5;">
+        <p style="margin: 8px 0; font-weight: bold;">
+          Start Here: 
+          <a href="http://training.opencare.com/" style="color:#007BFF; text-decoration: none;">Complete the “How to Use Opencare” Course</a>
+        </p>
+        <p style="margin: 8px 0;">
+          Before your onboarding call, we highly recommend going through our training course. This short, self-guided experience walks you through everything you need to succeed — from setting up your profile to understanding how to get the most value out of Opencare.
+        </p>
+
+        ${resources.includes('marketing') ? `
+          <p style="margin: 8px 0;">
+            <a href="YOUR_MARKETING_VIDEO_LINK_HERE" style="color:#007BFF; text-decoration: none;">
+              Learn How Opencare Markets to Patients (Podcast/Video)
+            </a>
+          </p>` : ''}
+
+        ${resources.includes('integration') ? `
+          <p style="margin: 8px 0;">
+            <a href="YOUR_INTEGRATION_VIDEO_LINK_HERE" style="color:#007BFF; text-decoration: none;">
+              Understanding Opencare’s Integration (Podcast/Video)
+            </a>
+          </p>` : ''}
+      </div>
+
+      <hr style="border: none; border-top: 1px solid #ddd; margin-top: 20px;" />
+      <p style="text-align: left; margin: 10px 0 0 0;">If you have any questions, please don't hesitate to respond to this email.</p>
+    </div>
+  `;
+}
+
+app.post('/submit', async (req, res) => {
+  const formData = req.body;
+
+  if (!formData.results_emails || !Array.isArray(formData.results_emails) || formData.results_emails.length === 0) {
+    return res.status(400).json({ error: 'No recipient emails provided' });
+  }
+
+  // Decide which resources to send
+  const resources = [];
+  if (formData.marketing_understanding === 'No') resources.push('marketing');
+  if (formData.integration_understanding === 'No') resources.push('integration');
+
+  const emailHtml = generateEmailHtml(formData, resources);
+
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
+    }
+  });
+
+  const mailOptions = {
+    from: '"Opencare Training" <enablement@opencare.com>',
+    to: formData.results_emails.join(','),
+    bcc: 'enablement@opencare.com',
+    subject: 'Opencare Pre-Onboarding Survey Summary & Training Materials',
+    html: emailHtml
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: 'Email sent successfully' });
+  } catch (error) {
+    console.error('Email error:', error);
+    res.status(500).json({ error: 'Failed to send email' });
+  }
+});
+
+app.get('/', (req, res) => {
+  res.send('Opencare Backend is Running!');
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+
+
+
