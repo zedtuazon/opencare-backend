@@ -347,91 +347,79 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Enable CORS for frontend
 app.use(cors({
   origin: 'https://opencare-preonboardingsurvey.onrender.com'
 }));
-
 app.use(express.json());
 app.use(express.static('public'));
 
-// Generate the email HTML
+// Updated HTML email content with conditional resources
 function generateEmailHtml(formData, resources) {
   const logoUrl = 'https://opencare-preonboardingsurvey.onrender.com/Opencare-Logo-Sage.png';
 
   return `
     <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; width: 100%;">
-
-      <!-- Logo centered -->
       <div style="text-align: center; margin-bottom: 8px;">
         <img src="${logoUrl}" alt="Opencare Logo" style="height: 90px;" />
       </div>
 
-      <!-- Thinner, darker separation line -->
       <hr style="border: none; border-top: 2px solid #003366; margin: 0 0 16px 0;" />
-
-      <!-- 1 space before survey response -->
       <div style="height: 10px;"></div>
 
-      <h2 style="color: #003366; padding-bottom: 4px; margin: 0 0 8px 0;">Survey Responses</h2>
-
-      <div style="text-align: left;">
-        <p style="margin: 2px 0;"><strong>Practice Name:</strong> ${formData.practice_name}</p>
-        <p style="margin: 2px 0;"><strong>Top Priority:</strong> ${formData.top_priority}${formData.top_priority === 'Something else' ? ` - ${formData.priority_detail}` : ''}</p>
-        <p style="margin: 2px 0;"><strong>Login Access:</strong> ${formData.login_access}</p>
-        <p style="margin: 2px 0;"><strong>Getting Started:</strong> ${formData.reviewed_content}</p>
-        <p style="margin: 2px 0;"><strong>Platform Confidence:</strong> ${formData.confidence}</p>
-        <p style="margin: 2px 0;"><strong>Billing Concerns:</strong> ${formData.billing_concerns}</p>
-        <!-- NEW QUESTIONS -->
-        <p style="margin: 2px 0;"><strong>Understands Marketing:</strong> ${formData.marketing_understanding}</p>
-        <p style="margin: 2px 0;"><strong>Understands Integration:</strong> ${formData.integration_understanding}</p>
+      <h2 style="color: #003366; font-size: 20px; margin-bottom: 10px;">Survey Responses</h2>
+      <div style="text-align: left; font-size: 15px;">
+        <p style="margin: 4px 0;"><strong>Practice Name:</strong> ${formData.practice_name}</p>
+        <p style="margin: 4px 0;"><strong>Top Priority:</strong> ${formData.top_priority}${formData.top_priority === 'Something else' ? ` - ${formData.priority_detail}` : ''}</p>
+        <p style="margin: 4px 0;"><strong>Login Access:</strong> ${formData.login_access}</p>
+        <p style="margin: 4px 0;"><strong>Getting Started:</strong> ${formData.reviewed_content}</p>
+        <p style="margin: 4px 0;"><strong>Platform Confidence:</strong> ${formData.confidence}</p>
+        <p style="margin: 4px 0;"><strong>Billing Concerns:</strong> ${formData.billing_concerns}</p>
+        <p style="margin: 4px 0;"><strong>Understands Opencare Marketing:</strong> ${formData.marketing_understanding}</p>
+        <p style="margin: 4px 0;"><strong>Understands Opencare Integration:</strong> ${formData.integration_understanding}</p>
       </div>
 
-      <h2 style="color: #003366; padding-top: 12px; margin: 20px 0 8px 0;">Recommended Training Materials</h2>
-
+      <h2 style="color: #003366; font-size: 20px; margin: 24px 0 10px 0;">Recommended Training Materials</h2>
       <div style="text-align: left; font-size: 15px; line-height: 1.5;">
-        ${resources.includes('login') ? `<p style="margin: 2px 0;"><a href="https://opencarepractice.zendesk.com/hc/en-us/articles/34764947028628-How-to-Login-to-my-Opencare-Account" style="color:#007BFF; text-decoration: none;">How to Log In to Opencare</a></p>` : ''}
+        <p style="margin: 8px 0; font-weight: bold;">
+          Start Here: 
+          <a href="http://training.opencare.com/" style="color:#007BFF; text-decoration: none;">Complete the “How to Use Opencare” Course</a>
+        </p>
+        <p style="margin: 8px 0;">
+          Before your onboarding call, we highly recommend going through our training course. This short, self-guided experience walks you through everything you need to succeed — from setting up your profile to understanding how to get the most value out of Opencare.
+        </p>
 
-        ${resources.includes('getting_started') ? `<p style="margin: 2px 0;"><a href="https://opencarepractice.zendesk.com/hc/en-us/categories/34649397171220" style="color:#007BFF; text-decoration: none;">Getting Started with Opencare</a></p>` : ''}
-
-        ${resources.includes('dashboard') ? `<p style="margin: 2px 0;"><a href="https://opencarepractice.zendesk.com/hc/en-us/articles/18554516947732-Navigating-the-Opencare-Dashboard" style="color:#007BFF; text-decoration: none;">Navigating the Opencare Dashboard</a></p>` : ''}
-
-        ${resources.includes('billing') ? `<p style="margin: 2px 0;"><a href="https://opencarepractice.zendesk.com/hc/en-us/sections/18554146776468-Module-3-Billing" style="color:#007BFF; text-decoration: none;">Billing at Opencare</a></p>` : ''}
-
-        <!-- MARKETING LINKS -->
         ${resources.includes('marketing') ? `
-          <ul style="margin: 8px 0 8px 16px; padding: 0; list-style-type: disc; color:#007BFF;">
+          <p style="margin: 12px 0 6px 0; font-weight: bold;">Opencare Marketing Resources:</p>
+          <ul style="margin: 0 0 12px 20px; padding: 0;">
             <li><a href="https://opencarepractice.zendesk.com/hc/en-us/articles/34779375057940-How-We-Match-You-with-Patients" style="color:#007BFF; text-decoration: none;">How We Match You with Patients</a></li>
             <li><a href="https://opencarepractice.zendesk.com/hc/en-us/articles/35454799998228-The-Opencare-Success-in-5-Podcast-Understanding-how-Opencare-attracts-patients" style="color:#007BFF; text-decoration: none;">The Opencare 'Success in 5' Podcast: Understanding how Opencare attracts patients</a></li>
           </ul>
           <p style="margin: 8px 0;">
             These two articles explain how Opencare invests in targeted marketing, including online advertising and partnerships, 
-            to attract high-quality patients actively looking for a dentist, and how our unique matching system connects them with 
-            the right practice for their specific needs.
+            to attract high-quality patients actively looking for a dentist, and how our unique matching system connects them with the right practice for their specific needs.
           </p>
         ` : ''}
 
-        <!-- INTEGRATION LINKS -->
         ${resources.includes('integration') ? `
-          <ul style="margin: 8px 0 8px 16px; padding: 0; list-style-type: disc; color:#007BFF;">
+          <p style="margin: 12px 0 6px 0; font-weight: bold;">Opencare Integration Resources:</p>
+          <ul style="margin: 0 0 12px 20px; padding: 0;">
             <li><a href="https://opencarepractice.zendesk.com/hc/en-us/articles/41346517717780-What-is-Opencare-Integration" style="color:#007BFF; text-decoration: none;">What is Opencare Integration?</a></li>
           </ul>
           <p style="margin: 8px 0;">
             Here are some details on how our Opencare Integration securely connects with your practice management software 
-            to help you increase appointment volume and reduce staff time spent on scheduling, all while you retain full control 
-            over booking requests. We look forward to setting this up with you during your onboarding!
+            to help you increase appointment volume and reduce staff time spent on scheduling, 
+            all while you retain full control over booking requests. 
+            We look forward to setting this up with you during your onboarding!
           </p>
         ` : ''}
       </div>
 
       <hr style="border: none; border-top: 1px solid #ddd; margin-top: 20px;" />
-
       <p style="text-align: left; margin: 10px 0 0 0;">If you have any questions, please don't hesitate to respond to this email.</p>
     </div>
   `;
 }
 
-// Handle form submission
 app.post('/submit', async (req, res) => {
   const formData = req.body;
 
@@ -439,12 +427,8 @@ app.post('/submit', async (req, res) => {
     return res.status(400).json({ error: 'No recipient emails provided' });
   }
 
+  // Decide which resources to send
   const resources = [];
-  if (formData.login_access === 'No') resources.push('login');
-  if (formData.reviewed_content === 'No') resources.push('getting_started');
-  if (formData.confidence === 'No') resources.push('dashboard');
-  if (formData.billing_concerns === 'Yes') resources.push('billing');
-  // NEW RESOURCE RULES
   if (formData.marketing_understanding === 'No') resources.push('marketing');
   if (formData.integration_understanding === 'No') resources.push('integration');
 
@@ -453,15 +437,15 @@ app.post('/submit', async (req, res) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: process.env.EMAIL_USER,  // Gmail
-      pass: process.env.EMAIL_PASS   // Gmail App Password
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
     }
   });
 
   const mailOptions = {
-    from: '"Opencare Training" <enablement@opencare.com>', // alias
+    from: '"Opencare Training" <enablement@opencare.com>',
     to: formData.results_emails.join(','),
-    bcc: 'enablement@opencare.com', // keep copy
+    bcc: 'enablement@opencare.com',
     subject: 'Opencare Pre-Onboarding Survey Summary & Training Materials',
     html: emailHtml
   };
@@ -475,7 +459,6 @@ app.post('/submit', async (req, res) => {
   }
 });
 
-// Health check
 app.get('/', (req, res) => {
   res.send('Opencare Backend is Running!');
 });
@@ -483,8 +466,3 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
-
-
-
-
