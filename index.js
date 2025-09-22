@@ -395,8 +395,8 @@ function generateEmailHtml(formData, resources) {
             <li><a href="https://opencarepractice.zendesk.com/hc/en-us/articles/35454799998228-The-Opencare-Success-in-5-Podcast-Understanding-how-Opencare-attracts-patients" style="color:#007BFF; text-decoration: none;">The Opencare 'Success in 5' Podcast: Understanding how Opencare attracts patients</a></li>
           </ul>
           <p style="margin: 8px 0;">
-            These two articles explain how Opencare invests in targeted marketing, including online advertising and partnerships, 
-            to attract high-quality patients actively looking for a dentist, and how our unique matching system connects them with the right practice for their specific needs.
+            These two articles explain how Opencare invests in targeted marketing, including online advertising, partnerships,
+            promotions and incentives, to attract high-quality patients actively looking for a dentist, and how our unique matching system connects them with the right practice for their specific needs.
           </p>
         ` : ''}
 
